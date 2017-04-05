@@ -79,9 +79,10 @@ int main() {
 	end = clock();
 	elapsed = (double) (end - begin) / CLOCKS_PER_SEC;
 
-	printf("Value-based: %0.8f (%0.8f)\n", elapsed, s1);
+	printf("=== Calculating sum of a list of %d floats ===\n", fn);
+	printf("* Value-based: %0.8f sec; sum = %0.8f\n", elapsed, s1);
 
-	// SSE3
+	// SSE
 	begin = clock();
 
 	float s2 = sum2(fa, fn);
@@ -89,7 +90,7 @@ int main() {
 	end = clock();
 	elapsed = (double) (end - begin) / CLOCKS_PER_SEC;
 
-	printf("SSE3: %0.8f (%0.8f)\n", elapsed, s2);
+	printf("* SSE: %0.8f sec; sum = %0.8f\n", elapsed, s2);
 
 	// Value-based on integers
 	begin = clock();
@@ -99,9 +100,10 @@ int main() {
 	end = clock();
 	elapsed = (double) (end - begin) / CLOCKS_PER_SEC;
 
-	printf("Value-based on integers: %0.8f (%lld)\n", elapsed, s3);
+	printf("=== Calculating sum of a list of %d integers ===\n", in);
+	printf("* Value-based: %0.8f sec; sum = %lld\n", elapsed, s3);
 
-	// SSE4 on integers
+	// SSE on integers
 	begin = clock();
 
 	unsigned long long s4 = sum4(ia, in);
@@ -109,7 +111,7 @@ int main() {
 	end = clock();
 	elapsed = (double) (end - begin) / CLOCKS_PER_SEC;
 
-	printf("SSE4 on integers: %0.8f (%lld)\n", elapsed, s4);
+	printf("* SSE: %0.8f sec; sum = %lld\n", elapsed, s4);
 
 	return 0;
 }

@@ -104,7 +104,8 @@ int main() {
 	end = clock();
 	elapsed = (double) (end - begin) / CLOCKS_PER_SEC;
 
-	printf("Value-based: %0.8f (%0.8f)\n", elapsed, m1);
+	printf("=== Looking for a maximum element in a list of %d floats ===\n", fn);
+	printf("* Value-based: %0.8f sec; max = %0.8f\n", elapsed, m1);
 
 	// index-based search
 	begin = clock();
@@ -114,7 +115,7 @@ int main() {
 	end = clock();
 	elapsed = (double) (end - begin) / CLOCKS_PER_SEC;
 
-	printf("Index-based: %0.8f (%0.8f)\n", elapsed, m2);
+	printf("* Index-based: %0.8f sec; max = %0.8f\n", elapsed, m2);
 
 	// SSE
 	begin = clock();
@@ -124,7 +125,7 @@ int main() {
 	end = clock();
 	elapsed = (double) (end - begin) / CLOCKS_PER_SEC;
 
-	printf("SSE: %0.8f (%0.8f)\n", elapsed, m3);
+	printf("* SSE: %0.8f sec; max = %0.8f\n", elapsed, m3);
 
 	// value-based on integers
 	begin = clock();
@@ -134,7 +135,8 @@ int main() {
 	end = clock();
 	elapsed = (double) (end - begin) / CLOCKS_PER_SEC;
 
-	printf("Value-based on integers: %0.8f (%d)\n", elapsed, m4);
+	printf("=== Looking for a maximum element in a list of %d integers ===\n", in);
+	printf("* Value-based: %0.8f sec; max = %d\n", elapsed, m4);
 
 	// index-based on integers
 	begin = clock();
@@ -144,9 +146,9 @@ int main() {
 	end = clock();
 	elapsed = (double) (end - begin) / CLOCKS_PER_SEC;
 
-	printf("Index-based on integers: %0.8f (%d)\n", elapsed, m5);
+	printf("* Index-based: %0.8f sec; max = %d\n", elapsed, m5);
 
-	// SSE4 on integers
+	// SSE on integers
 	begin = clock();
 
 	int m6 = max6(ia, in);
@@ -154,7 +156,7 @@ int main() {
 	end = clock();
 	elapsed = (double) (end - begin) / CLOCKS_PER_SEC;
 
-	printf("SSE4 on integers: %0.8f (%d)\n", elapsed, m6);
+	printf("* SSE: %0.8f sec; max = %d\n", elapsed, m6);
 
 	return 0;
 }
