@@ -4,8 +4,10 @@
 
 ## Building
 
-Just run `make`. You'll need Ruby *(any version)*, C++ and a processor, which supports SSE4 features.
+Use CMake: `cmake -B build -H . && cmake --build build`.
+You'll need a modern C++ compiler and a processor with SSE4 support.
 
 ## Running
 
-Executables are put into `build/` directory. Run `./build/basics`, `./build/max` or `./build/sum`.
+Executables are put in the `build/` directory.
+Run `./build/sse-basics`, `./build/sse-max` or `./build/sse-sum` to start the corresponding sample.

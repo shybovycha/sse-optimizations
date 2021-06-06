@@ -1,162 +1,176 @@
 #include <emmintrin.h>
 #include <smmintrin.h>
-#include <stdio.h>
+
+#include <iostream>
 #include <ctime>
-#include "float_array.h"
-#include "int_array.h"
 
-float max1(float *a, int n) {
-	float res = a[0];
+#include "generators.hpp"
 
-	for (int i = 1; i < n; i++) {
-		if (a[i] > res)
-			res = a[i];
-	}
+float max1(float* a, int n) {
+    float res = a[0];
 
-	return res;
+    for (int i = 1; i < n; i++) {
+        if (a[i] > res) {
+            res = a[i];
+        }
+    }
+
+    return res;
 }
 
-float max2(float *a, int n) {
-	int res = 0;
+float max2(float* a, int n) {
+    int res = 0;
 
-	for (int i = 1; i < n; i++) {
-		if (a[i] > a[res])
-			res = i;
-	}
+    for (int i = 1; i < n; i++) {
+        if (a[i] > a[res]) {
+            res = i;
+        }
+    }
 
-	return a[res];
+    return a[res];
 }
 
-float max3(float *a, int n) {
-	float res;
+float max3(float* a, int n) {
+    float res;
 
-	__m128 *f4 = (__m128*) a;
-	__m128 maxval = _mm_setzero_ps();
+    __m128* f4 = reinterpret_cast<__m128*>(a);
+    __m128 maxval = _mm_setzero_ps();
 
-	for (int i = 0; i < n / 4; i++) {
-		maxval = _mm_max_ps(maxval, f4[i]);
-	}
+    for (int i = 0; i < n / 4; i++) {
+        maxval = _mm_max_ps(maxval, f4[i]);
+    }
 
-	for (int i = 0; i < 3; i++) {
-		maxval = _mm_max_ps(maxval, _mm_shuffle_ps(maxval, maxval, 0x93));
-	}
+    for (int i = 0; i < 3; i++) {
+        maxval = _mm_max_ps(maxval, _mm_shuffle_ps(maxval, maxval, 0x93));
+    }
 
-	_mm_store_ss(&res, maxval);
+    _mm_store_ss(&res, maxval);
 
-	return res;
+    return res;
 }
 
-int max4(int *a, int n) {
-	int res = a[0];
+int max4(int* a, int n) {
+    int res = a[0];
 
-	for (int i = 1; i < n; i++) {
-		if (a[i] > res)
-			res = a[i];
-	}
+    for (int i = 1; i < n; i++) {
+        if (a[i] > res) {
+            res = a[i];
+        }
+    }
 
-	return res;
+    return res;
 }
 
-int max5(int *a, int n) {
-	int res = 0;
+int max5(int* a, int n) {
+    int res = 0;
 
-	for (int i = 1; i < n; i++) {
-		if (a[i] > a[res])
-			res = i;
-	}
+    for (int i = 1; i < n; i++) {
+        if (a[i] > a[res]) {
+            res = i;
+        }
+    }
 
-	return a[res];
+    return a[res];
 }
 
-int max6(int *a, int n) {
-	int res;
+int max6(int* a, int n) {
+    int res;
 
-	__m128i *f4 = (__m128i*) a;
-	__m128i maxval = _mm_setzero_si128();
+    __m128i* f4 = reinterpret_cast<__m128i*>(a);
+    __m128i maxval = _mm_setzero_si128();
 
-	for (int i = 0; i < n / 4; i++) {
-		maxval = _mm_max_epi32(maxval, f4[i]);
-	}
+    for (int i = 0; i < n / 4; i++) {
+        maxval = _mm_max_epi32(maxval, f4[i]);
+    }
 
-	for (int i = 0; i < 3; i++) {
-		maxval = _mm_max_epi32(maxval, _mm_shuffle_epi32(maxval, 0x93));
-	}
+    for (int i = 0; i < 3; i++) {
+        maxval = _mm_max_epi32(maxval, _mm_shuffle_epi32(maxval, 0x93));
+    }
 
-	res = _mm_cvtsi128_si32(maxval);
+    res = _mm_cvtsi128_si32(maxval);
 
-	return res;
+    return res;
 }
 
 int main() {
-	using namespace std;
+    std::cout << "Generating float array...";
+    int fn = 10000;
+    float* fa = generateFloatArray(fn);
+    std::cout << "done\n";
 
-	int fn = sizeof(fa) / sizeof(float);
-	int in = sizeof(ia) / sizeof(int);
+    std::cout << "Generating int array...";
+    int in = 30000;
+    int* ia = generateIntArray(in);
+    std::cout << "done\n";
 
-	clock_t begin, end;
-	double elapsed;
+    clock_t begin, end;
+    double elapsed;
 
-	// value-based search
-	begin = clock();
+    // value-based search
+    begin = clock();
 
-	float m1 = max1(fa, fn);
+    float m1 = max1(fa, fn);
 
-	end = clock();
-	elapsed = (double) (end - begin) / CLOCKS_PER_SEC;
+    end = clock();
+    elapsed = static_cast<double>(end - begin) / CLOCKS_PER_SEC;
 
-	printf("=== Looking for a maximum element in a list of %d floats ===\n", fn);
-	printf("* Value-based: %0.8f sec; max = %0.8f\n", elapsed, m1);
+    std::cout << "=== Looking for a maximum element in a list of " << fn << " floats ===\n";
+    std::cout << "* Value-based: " << elapsed << " sec; max = " << m1 << "\n";
 
-	// index-based search
-	begin = clock();
+    // index-based search
+    begin = clock();
 
-	float m2 = max2(fa, fn);
+    float m2 = max2(fa, fn);
 
-	end = clock();
-	elapsed = (double) (end - begin) / CLOCKS_PER_SEC;
+    end = clock();
+    elapsed = static_cast<double>(end - begin) / CLOCKS_PER_SEC;
 
-	printf("* Index-based: %0.8f sec; max = %0.8f\n", elapsed, m2);
+    std::cout << "* Index-based: " << elapsed << " sec; max = " << m2 << "\n";
 
-	// SSE
-	begin = clock();
+    // SSE
+    begin = clock();
 
-	float m3 = max3(fa, fn);
+    float m3 = max3(fa, fn);
 
-	end = clock();
-	elapsed = (double) (end - begin) / CLOCKS_PER_SEC;
+    end = clock();
+    elapsed = static_cast<double>(end - begin) / CLOCKS_PER_SEC;
 
-	printf("* SSE: %0.8f sec; max = %0.8f\n", elapsed, m3);
+    std::cout << "* SSE: " << elapsed << " sec; max = " << m3 << "\n";
 
-	// value-based on integers
-	begin = clock();
+    // value-based on integers
+    begin = clock();
 
-	int m4 = max4(ia, in);
+    int m4 = max4(ia, in);
 
-	end = clock();
-	elapsed = (double) (end - begin) / CLOCKS_PER_SEC;
+    end = clock();
+    elapsed = static_cast<double>(end - begin) / CLOCKS_PER_SEC;
 
-	printf("=== Looking for a maximum element in a list of %d integers ===\n", in);
-	printf("* Value-based: %0.8f sec; max = %d\n", elapsed, m4);
+    std::cout << "=== Looking for a maximum element in a list of " << in << " integers ===\n";
+    std::cout << "* Value-based: " << elapsed << " sec; max = " << m4 << "\n";
 
-	// index-based on integers
-	begin = clock();
+    // index-based on integers
+    begin = clock();
 
-	int m5 = max5(ia, in);
+    int m5 = max5(ia, in);
 
-	end = clock();
-	elapsed = (double) (end - begin) / CLOCKS_PER_SEC;
+    end = clock();
+    elapsed = static_cast<double>(end - begin) / CLOCKS_PER_SEC;
 
-	printf("* Index-based: %0.8f sec; max = %d\n", elapsed, m5);
+    std::cout << "* Index-based: " << elapsed << " sec; max = " << m5 << "\n";
 
-	// SSE on integers
-	begin = clock();
+    // SSE on integers
+    begin = clock();
 
-	int m6 = max6(ia, in);
+    int m6 = max6(ia, in);
 
-	end = clock();
-	elapsed = (double) (end - begin) / CLOCKS_PER_SEC;
+    end = clock();
+    elapsed = static_cast<double>(end - begin) / CLOCKS_PER_SEC;
 
-	printf("* SSE: %0.8f sec; max = %d\n", elapsed, m6);
+    std::cout << "* SSE: " << elapsed << " sec; max = " << m6 << "\n";
 
-	return 0;
+    // prevent memory leaks
+    delete fa;
+    delete ia;
+
+    return 0;
 }
