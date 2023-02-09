@@ -3,10 +3,13 @@
 #include <emmintrin.h>
 
 #include <iostream>
-#include <ctime>
 
 #include "generators.hpp"
+#include "benchmark.hpp"
 
+/*
+* Simple linear summation of an array
+*/
 float sum1(float* a, int n) {
     float res = 0.0;
 
@@ -17,6 +20,9 @@ float sum1(float* a, int n) {
     return res;
 }
 
+/*
+* 1/4-th of an array is being actually iterated; the SSE add every 4 elements
+*/
 float sum2(float* a, int n) {
     float res = 0.0;
 
@@ -67,57 +73,38 @@ int main() {
     int fn = 10000;
     int in = 30000;
 
-    float* fa = generateFloatArray(fn);
-    int* ia = generateIntArray(in);
-
-    clock_t begin, end;
-    double elapsed;
+    auto fa = generateFloatArray(fn);
+    auto ia = generateIntArray(in);
 
     // value-based sum
-    begin = clock();
-
-    float s1 = sum1(fa, fn);
-
-    end = clock();
-    elapsed = static_cast<double>(end - begin) / CLOCKS_PER_SEC;
+    float s1 = 0.f; 
+    
+    auto elapsed1 = benchmark([&]() { s1 = sum1(fa.get(), fn); });
 
     std::cout << "=== Calculating sum of a list of " << fn << " floats ===\n";
-    std::cout << "* Value-based: " << elapsed << " sec; sum = " << s1 << "\n";
+    std::cout << "* Value-based: " << elapsed1 << " sec; sum = " << s1 << "\n";
 
     // SSE
-    begin = clock();
+    float s2 = 0.f;
+    
+    auto elapsed2 = benchmark([&]() { s2 = sum2(fa.get(), fn); });
 
-    float s2 = sum2(fa, fn);
-
-    end = clock();
-    elapsed = static_cast<double>(end - begin) / CLOCKS_PER_SEC;
-
-    std::cout << "* SSE: " << elapsed << " sec; sum = " << s2 << "\n";
+    std::cout << "* SSE: " << elapsed2 << " sec; sum = " << s2 << "\n";
 
     // Value-based on integers
-    begin = clock();
-
-    unsigned long long s3 = sum3(ia, in);
-
-    end = clock();
-    elapsed = static_cast<double>(end - begin) / CLOCKS_PER_SEC;
+    unsigned long long s3 = 0;
+    
+    auto elapsed3 = benchmark([&]() { s3 = sum3(ia.get(), in); });
 
     std::cout << "=== Calculating sum of a list of " << in << " integers ===\n";
-    std::cout << "* Value-based: " << elapsed << " sec; sum = " << s3 << "\n";
+    std::cout << "* Value-based: " << elapsed3 << " sec; sum = " << s3 << "\n";
 
     // SSE on integers
-    begin = clock();
+    unsigned long long s4 = 0;
+    
+    auto elapsed4 = benchmark([&]() { s4 = sum4(ia.get(), in); });
 
-    unsigned long long s4 = sum4(ia, in);
-
-    end = clock();
-    elapsed = static_cast<double>(end - begin) / CLOCKS_PER_SEC;
-
-    std::cout << "* SSE: " << elapsed << " sec; sum = " << s4 << "\n";
-
-    // prevent memory leaks
-    delete fa;
-    delete ia;
+    std::cout << "* SSE: " << elapsed4 << " sec; sum = " << s4 << "\n";
 
     return 0;
 }

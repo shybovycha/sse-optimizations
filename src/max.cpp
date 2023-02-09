@@ -2,9 +2,9 @@
 #include <smmintrin.h>
 
 #include <iostream>
-#include <ctime>
 
 #include "generators.hpp"
+#include "benchmark.hpp"
 
 float max1(float* a, int n) {
     float res = a[0];
@@ -94,83 +94,64 @@ int max6(int* a, int n) {
 
 int main() {
     std::cout << "Generating float array...";
+    
     int fn = 10000;
-    float* fa = generateFloatArray(fn);
+    auto fa = generateFloatArray(fn);
+
     std::cout << "done\n";
 
     std::cout << "Generating int array...";
+
     int in = 30000;
-    int* ia = generateIntArray(in);
+    auto ia = generateIntArray(in);
+
     std::cout << "done\n";
 
-    clock_t begin, end;
-    double elapsed;
-
     // value-based search
-    begin = clock();
-
-    float m1 = max1(fa, fn);
-
-    end = clock();
-    elapsed = static_cast<double>(end - begin) / CLOCKS_PER_SEC;
+    float m1 = 0.f;
 
     std::cout << "=== Looking for a maximum element in a list of " << fn << " floats ===\n";
-    std::cout << "* Value-based: " << elapsed << " sec; max = " << m1 << "\n";
+
+    auto elapsed1 = benchmark([&]() { m1 = max1(fa.get(), fn); });
+
+    std::cout << "* Value-based: " << elapsed1 << " ms; max = " << m1 << "\n";
 
     // index-based search
-    begin = clock();
+    float m2 = 0.f;
 
-    float m2 = max2(fa, fn);
+    auto elapsed2 = benchmark([&]() { m2 = max2(fa.get(), fn); });
 
-    end = clock();
-    elapsed = static_cast<double>(end - begin) / CLOCKS_PER_SEC;
-
-    std::cout << "* Index-based: " << elapsed << " sec; max = " << m2 << "\n";
+    std::cout << "* Index-based: " << elapsed2 << " ms; max = " << m2 << "\n";
 
     // SSE
-    begin = clock();
+    float m3 = 0.f;
 
-    float m3 = max3(fa, fn);
+    auto elapsed3 = benchmark([&]() { m3 = max3(fa.get(), fn); });
 
-    end = clock();
-    elapsed = static_cast<double>(end - begin) / CLOCKS_PER_SEC;
-
-    std::cout << "* SSE: " << elapsed << " sec; max = " << m3 << "\n";
+    std::cout << "* SSE: " << elapsed3 << " ms; max = " << m3 << "\n";
 
     // value-based on integers
-    begin = clock();
-
-    int m4 = max4(ia, in);
-
-    end = clock();
-    elapsed = static_cast<double>(end - begin) / CLOCKS_PER_SEC;
-
+    int m4 = 0;
+    
     std::cout << "=== Looking for a maximum element in a list of " << in << " integers ===\n";
-    std::cout << "* Value-based: " << elapsed << " sec; max = " << m4 << "\n";
+
+    auto elapsed4 = benchmark([&]() { m4 = max4(ia.get(), in); });
+
+    std::cout << "* Value-based: " << elapsed4 << " ms; max = " << m4 << "\n";
 
     // index-based on integers
-    begin = clock();
+    int m5 = 0;
 
-    int m5 = max5(ia, in);
+    auto elapsed5 = benchmark([&]() { m5 = max5(ia.get(), in); });
 
-    end = clock();
-    elapsed = static_cast<double>(end - begin) / CLOCKS_PER_SEC;
-
-    std::cout << "* Index-based: " << elapsed << " sec; max = " << m5 << "\n";
+    std::cout << "* Index-based: " << elapsed5 << " ms; max = " << m5 << "\n";
 
     // SSE on integers
-    begin = clock();
+    int m6 = 0;
 
-    int m6 = max6(ia, in);
+    auto elapsed6 = benchmark([&]() { m6 = max6(ia.get(), in); });
 
-    end = clock();
-    elapsed = static_cast<double>(end - begin) / CLOCKS_PER_SEC;
-
-    std::cout << "* SSE: " << elapsed << " sec; max = " << m6 << "\n";
-
-    // prevent memory leaks
-    delete fa;
-    delete ia;
+    std::cout << "* SSE: " << elapsed6 << " ms; max = " << m6 << "\n";
 
     return 0;
 }
