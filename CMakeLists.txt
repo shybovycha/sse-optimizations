@@ -1,21 +1,11 @@
 cmake_minimum_required(VERSION 3.23)
 
-project(sse-optimizations)
+project(sse-optimizations LANGUAGES CXX)
 
-add_executable(sse-basics src/basics.cpp src/benchmark.hpp)
-add_executable(sse-max src/max.cpp src/generators.hpp src/benchmark.hpp)
-add_executable(sse-sum src/sum.cpp src/generators.hpp src/benchmark.hpp)
+set(CMAKE_CXX_STANDARD 20)
 
-set_property(TARGET sse-basics PROPERTY CXX_STANDARD 20)
-set_property(TARGET sse-max PROPERTY CXX_STANDARD 20)
-set_property(TARGET sse-sum PROPERTY CXX_STANDARD 20)
+add_subdirectory(common)
 
-if(MSVC)
-    target_compile_options(sse-basics INTERFACE /arch:AVX512)
-    target_compile_options(sse-max INTERFACE /arch:AVX512)
-    target_compile_options(sse-sum INTERFACE /arch:AVX512)
-else()
-    target_compile_options(sse-basics INTERFACE -msse4.2)
-    target_compile_options(sse-max INTERFACE -msse4.2)
-    target_compile_options(sse-sum INTERFACE -msse4.2)
-endif()
+add_subdirectory(1-basics)
+add_subdirectory(2-sum)
+add_subdirectory(3-max)

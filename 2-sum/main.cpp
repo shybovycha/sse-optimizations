@@ -4,8 +4,8 @@
 
 #include <iostream>
 
-#include "generators.hpp"
-#include "benchmark.hpp"
+#include <generators.hpp>
+#include <benchmark.hpp>
 
 /*
 * Simple linear summation of an array

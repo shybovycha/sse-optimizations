@@ -3,8 +3,8 @@
 
 #include <iostream>
 
-#include "generators.hpp"
-#include "benchmark.hpp"
+#include <generators.hpp>
+#include <benchmark.hpp>
 
 float max1(float* a, int n) {
     float res = a[0];
